@@ -62,7 +62,7 @@ extern crate count_array;
 
 let mylength = 2;
 let myelements = 3;
-for myslice in count_array::over<u32>(myelements, mylength) {
+for myslice in count_array::over(myelements, mylength) {
     println!("Found: {}", myslice);
 }
 println!("Done!");
@@ -75,6 +75,7 @@ This should be really straight-forward.
 - Everything
 - Extend it to other integers
 - Compare speed against `permutate`
+- `StreamingIterator` implementation
 
 ## Contribute
 

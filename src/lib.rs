@@ -28,9 +28,10 @@ impl Counter {
      **/
     pub fn new(domain: u32, len: usize) -> Counter {
         assert!(domain > 0, "domain must be positive, but was {}", domain);
+        let domain_m_one = domain - 1;
         Counter {
-            data: vec![0; len],
-            domain_m_one: domain - 1,
+            data: vec![domain_m_one; len],
+            domain_m_one: domain_m_one,
         }
     }
 
@@ -49,6 +50,24 @@ impl Counter {
         }
         true
     }
+
+    /**
+     * Low-level read access to current state.
+     */
+    pub fn read(&self) -> &[u32] {
+        self.data.as_slice()
+    }
+
+    /**
+     * Iterator-like implementation.
+     */
+    pub fn next(&mut self) -> Option<&[u32]> {
+        if self.inc() {
+            None
+        } else {
+            Some(self.read())
+        }
+    }
 }
 
 #[test]
@@ -61,7 +80,14 @@ fn test_invalid_panics() {
 fn test_construction() {
     let c = Counter::new(4, 3);
     assert_eq!(c.domain_m_one, 3);
-    assert_eq!(c.data, vec![0, 0, 0]);
+    assert_eq!(c.data, vec![3, 3, 3]);
+}
+
+#[test]
+fn test_construction_more() {
+    let c = Counter::new(99, 3);
+    assert_eq!(c.domain_m_one, 98);
+    assert_eq!(c.data, vec![98, 98, 98]);
 }
 
 #[test]
@@ -69,4 +95,27 @@ fn test_increment() {
     let mut c = Counter { data: vec![0, 0, 0], domain_m_one: 3 };
     assert_eq!(false, c.inc());
     assert_eq!(c.data, vec![1, 0, 0]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![2, 0, 0]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![3, 0, 0]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![0, 1, 0]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![1, 1, 0]);
+}
+
+#[test]
+fn test_increment_end() {
+    let mut c = Counter { data: vec![3, 2, 3], domain_m_one: 3 };
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![0, 3, 3]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![1, 3, 3]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![2, 3, 3]);
+    assert_eq!(false, c.inc());
+    assert_eq!(c.data, vec![3, 3, 3]);
+    assert_eq!(true, c.inc());
+    assert_eq!(c.data, vec![0, 0, 0]);
 }
