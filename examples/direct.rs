@@ -20,8 +20,9 @@ fn main() {
     let mylength = 2;
     let myelements = 3;
     let mut counter = count_array::over(myelements, mylength);
-    while let Some(myslice) = counter.next() {
-        println!("Found: {:?}", &myslice);
-    }
+    while {
+        println!("Found: {:?}", counter.read());
+        !counter.inc()
+    } { }
     println!("Done!");
 }
