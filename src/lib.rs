@@ -22,7 +22,7 @@ pub struct Counter {
 
 impl Counter {
     /**
-     * Low-level constructor.
+     * Constructor.
      * Initializes a new counter with the given length over the given domain.
      * `domain` means how many different values each position can take.
      **/
@@ -68,6 +68,15 @@ impl Counter {
             Some(self.read())
         }
     }
+}
+
+/**
+ * Constructor, calls `Counter::new`.
+ * Initializes a new counter with the given length over the given domain.
+ * `domain` means how many different values each position can take.
+ **/
+pub fn over(domain: u32, len: usize) -> Counter {
+    Counter::new(domain, len)
 }
 
 #[test]
