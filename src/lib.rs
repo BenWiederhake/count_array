@@ -17,21 +17,20 @@
 /// A `Counter` contains the state of the counting, and doubles as in `Iterator`.
 pub struct Counter {
     data: Vec<u32>,
-    domain_m_one: u32,
+    max: u32,
 }
 
 impl Counter {
     /**
      * Constructor.
-     * Initializes a new counter with the given length over the given domain.
-     * `domain` means how many different values each position can take.
+     * Initializes a new counter with the given length over the given domain,
+     * starting at the lowest value.
+     * `max` represents the maximum value of a place.
      **/
-    pub fn new(domain: u32, len: usize) -> Counter {
-        assert!(domain > 0, "domain must be positive, but was {}", domain);
-        let domain_m_one = domain - 1;
+    pub fn new(max: u32, len: usize) -> Counter {
         Counter {
-            data: vec![domain_m_one; len],
-            domain_m_one: domain_m_one,
+            data: vec![0; len],
+            max: max,
         }
     }
 
@@ -41,7 +40,7 @@ impl Counter {
      **/
     pub fn inc(&mut self) -> bool {
         for item in self.data.iter_mut() {
-            if *item == self.domain_m_one {
+            if *item == self.max {
                 *item = 0;
             } else {
                 *item += 1;
@@ -57,51 +56,35 @@ impl Counter {
     pub fn read(&self) -> &[u32] {
         self.data.as_slice()
     }
-
-    /**
-     * Iterator-like implementation.
-     */
-    pub fn next(&mut self) -> Option<&[u32]> {
-        if self.inc() {
-            None
-        } else {
-            Some(self.read())
-        }
-    }
 }
 
 /**
  * Constructor, calls `Counter::new`.
- * Initializes a new counter with the given length over the given domain.
- * `domain` means how many different values each position can take.
+ * Initializes a new counter with the given length over the given domain,
+ * starting at the lowest value.
+ * `max` represents the maximum value of a place.
  **/
-pub fn over(domain: u32, len: usize) -> Counter {
-    Counter::new(domain, len)
-}
-
-#[test]
-#[should_panic(expected="domain must be positive, but was 0")]
-fn test_invalid_panics() {
-    Counter::new(0, 3);
+pub fn over(max: u32, len: usize) -> Counter {
+    Counter::new(max, len)
 }
 
 #[test]
 fn test_construction() {
-    let c = Counter::new(4, 3);
-    assert_eq!(c.domain_m_one, 3);
-    assert_eq!(c.data, vec![3, 3, 3]);
+    let c = Counter::new(3, 3);
+    assert_eq!(c.max, 3);
+    assert_eq!(c.data, vec![0, 0, 0]);
 }
 
 #[test]
 fn test_construction_more() {
     let c = Counter::new(99, 3);
-    assert_eq!(c.domain_m_one, 98);
-    assert_eq!(c.data, vec![98, 98, 98]);
+    assert_eq!(c.max, 99);
+    assert_eq!(c.data, vec![0, 0, 0]);
 }
 
 #[test]
 fn test_increment() {
-    let mut c = Counter { data: vec![0, 0, 0], domain_m_one: 3 };
+    let mut c = Counter { data: vec![0, 0, 0], max: 3 };
     assert_eq!(false, c.inc());
     assert_eq!(c.data, vec![1, 0, 0]);
     assert_eq!(false, c.inc());
@@ -116,7 +99,7 @@ fn test_increment() {
 
 #[test]
 fn test_increment_end() {
-    let mut c = Counter { data: vec![3, 2, 3], domain_m_one: 3 };
+    let mut c = Counter { data: vec![3, 2, 3], max: 3 };
     assert_eq!(false, c.inc());
     assert_eq!(c.data, vec![0, 3, 3]);
     assert_eq!(false, c.inc());
