@@ -1,0 +1,11 @@
+[package]
+name = "count_array"
+version = "0.1.0"
+authors = ["Ben Wiederhake <BenWiederhake.GitHub@gmx.de>"]
+description = "Count an array as if it was a number"
+repository = "https://github.com/BenWiederhake/count_array"
+readme = "README.md"
+license = "GPL-3.0"
+#license-file = "LICENSE"
+
+[dependencies]
