@@ -18,6 +18,7 @@ or [`masked_permute`](https://github.com/BenWiederhake/masked_permute).
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
+- [Performance](#performance)
 - [TODOs](#todos)
 - [Contribute](#contribute)
 
@@ -62,13 +63,30 @@ extern crate count_array;
 
 let mylength = 2;
 let myelements = 3;
-for myslice in count_array::over(myelements, mylength) {
-    println!("Found: {}", myslice);
-}
+let mut counter = count_array::over(myelements, mylength);
+while {
+    println!("Found: {:?}", counter.read());
+    !counter.inc()
+} { }
 println!("Done!");
 ```
 
-This should be really straight-forward.
+This is mostly straight-forward, except that the `Counter` is not usable as an iterator.
+
+## Performance
+
+It seems to take around 8 nanoseconds per step, so barely any overhead at all.
+Locality should be mostly preserved, as all data will be stored in two contiguous regions:
+`Vec` and `Counter` metadata; and the actual data referenced from `Vec`.
+
+```
+test bench_000027 ... bench:         281 ns/iter (+/- 21)
+                                ==>   10.4 ns/step (+/- 0.8)
+test bench_001024 ... bench:       8,619 ns/iter (+/- 286)
+                                ==>    8.4 ns/step (+/- 0.3)
+test bench_100000 ... bench:     823,473 ns/iter (+/- 47,699)
+                                ==>    8.2 ns/step (+/- 0.5)
+```
 
 ## TODOs
 
